@@ -1,0 +1,23 @@
+{
+  "name": "aw_project_1",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "type":"module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/holmatron/AW-Project1.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/holmatron/AW-Project1/issues"
+  },
+  "homepage": "https://github.com/holmatron/AW-Project1#readme",
+  "dependencies": {
+    "pg": "^8.7.3"
+  }
+}
