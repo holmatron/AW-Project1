@@ -4,14 +4,22 @@ import pkg from "pg";
 const { Client } = pkg;
 
 async function lisaa_timestamp(
-  s_date,
+  startDate,
   s_time,
-  e_datename,
-  e_time,
-  project,
+  startTime,
+  endDate,
+  endTime,
+  projectName,
   description
 ) {
-  const values = [s_date, s_time, e_datename, e_time, project, description];
+  const values = [
+    startDate,
+    startTime,
+    endDate,
+    endTime,
+    projectName,
+    description,
+  ];
   const client = new Client({
     connectionString: process.env.DB_CONNECTIONSTRING,
   });
