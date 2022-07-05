@@ -67,6 +67,6 @@ let validate = () => {
 
 process.stdin.on('data', toDB)
 
-// 2022-07-05, 09:04, 2022-07-05, 17:19, Projekti Elmeri, I coded and ate lunch
-// 2022-07-05, 09:04, 2022-07-04, 17:19, Projekti Elmeri, I coded and ate lunch
-// 2022-07-05, 09:04, 2023-07-05, 17:19, Projekti Elmeri, I coded and ate lunch
+// 2022-07-05, 09:04, 2022-07-05, 17:19, Projekti Elmer, I coded and ate lunch
+// 2022-07-05, 09:04, 2022-07-04, 17:19, Projekti Elmer, I coded and ate lunch
+// 2022-07-05, 09:04, 2023-07-05, 17:19, Projekti Elmer, I coded and ate lunch
