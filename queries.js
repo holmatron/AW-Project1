@@ -1,1 +1,0 @@
-console.log("Moi sanoo Emma taas");
