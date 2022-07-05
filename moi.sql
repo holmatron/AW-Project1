@@ -1,6 +1,3 @@
-console.log("moi");
-console.log("Moi sanoo Emma")
-
 CREATE TABLE timestamps (
     id SERIAL PRIMARY KEY,
     start_date TIMESTAMP NOT NULL,
