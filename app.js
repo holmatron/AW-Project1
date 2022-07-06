@@ -8,20 +8,25 @@ process.stdout.write(`Hello! Please add your working hours in this format:\n
 `)
 
 //CORRECT DATA
-// 2022-07-05,09:04,2022-07-05,17:19,Project Maria,I coded and ate lunch
+// 2022-07-05,09:04,2022-07-05,17:19,Project Elmer,I coded and ate lunch
+// 2022-07-05,09:04,2022-07-05,12:19,Project Sun,I coded and ate lunch
 //INVALID DATA
 // 2022-07-05, 09:04, 2022-07-04, 17:19, Project Elmer, I coded and ate lunch
 // 2022-07-05, 09:04, 2023-07-05, 17:19, Project Elmer, I coded and ate lunch
+// 2022-07-05,09:04,2022-07-05,17:19,Project Elmer,I coded and ate lunch;--
 
+let allInput = ""
 let startDate = ""
 let startTime = ""
 let endDate = ""
 let endTime = ""
 let projectName = ""
 let description = ""
+let time_sum = ""
 
 async function collectTimestamp(userInput) {
     let input = userInput.toString().trim()
+    allInput = input
     let inputSplit = input.split(",")
     startDate = inputSplit[0]
     startTime = inputSplit[1]
@@ -30,6 +35,15 @@ async function collectTimestamp(userInput) {
     projectName = inputSplit[4]
     description = inputSplit[5]
     validate()
+    let startSplit = startTime.split(':')
+    let startMin = parseInt(startSplit[1])
+    let startHour = parseInt(startSplit[0])
+    let endSplit = endTime.split(':')
+    let endMin = parseInt(endSplit[1])
+    let endHour = parseInt(endSplit[0])
+    let totalHours = endHour - startHour
+    let totalMinutes = endMin - startMin
+    time_sum = (`${totalHours}:${totalMinutes}`)
     process.stdout.write(`\nThank you, your input was the following: \n`)
     process.stdout.write(`
     Start date: ${startDate}
@@ -50,6 +64,11 @@ let validate = () => {
     let dayOfEnd = parseInt(endDate.split("-")[2])
     let monthOfEnd = parseInt(endDate.split("-")[1])
     let yearOfEnd = parseInt(endDate.split("-")[0])
+    let format = /[!@#$%^&*()_+\=\[\]{};'"\\|<>\/?]+/
+    if (format.test(allInput)) {
+        process.stdout.write(`\nSorry there was a probelm with your input:\nNo special characters aloud.\nRestart to try again.\n`)
+        process.exit()
+    }
     if (startDate === "" || startTime === "" || endDate === "" || endTime === "" || projectName === "" || description === "") {
         process.stdout.write(`Sorry there was a probelm with your input:\nPlease fill in all the fields.\nRestart to try again.`)
         process.exit()
@@ -74,6 +93,7 @@ let validate = () => {
             process.exit()
         }
     }
+
     return
 }
 
@@ -85,10 +105,12 @@ async function toDB() {
     values.push(endTime)
     values.push(projectName)
     values.push(description)
+    values.push(time_sum)
   
+    //postgres://YourUserName:YourPassword@YourEndpoint:5432/YourDatabaseName
     const client = new Client({ connectionString: process.env.DB_CONNECTIONSTRING,})
     await client.connect()
-    const res = await client.query("INSERT INTO timestamps (start_date,start_time,end_date,end_time,project,description) VALUES ($1,$2,$3,$4,$5,$6)", values)
+    const res = await client.query("INSERT INTO timestamps (start_date,start_time,end_date,end_time,project,description,time_sum) VALUES ($1,$2,$3,$4,$5,$6,$7)", values)
     await client.end()
 }
 
