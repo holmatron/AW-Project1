@@ -1,17 +1,26 @@
 import "dotenv/config";
 import pkg from "pg";
-
-const { Client } = pkg;
-
-async function lisaa_timestamp(
+y;
+import {
   startDate,
-  s_time,
   startTime,
   endDate,
   endTime,
   projectName,
-  description
-) {
+  description,
+} from "./app.js";
+
+const { Client } = pkg;
+
+async function lisaa_timestamp({
+  startDate,
+
+  startTime,
+  endDate,
+  endTime,
+  projectName,
+  description,
+}) {
   const values = [
     startDate,
     startTime,
