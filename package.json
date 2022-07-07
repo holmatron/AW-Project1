@@ -1,0 +1,27 @@
+{
+  "name": "project1",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/holmatron/AW-Project1.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/holmatron/AW-Project1/issues"
+  },
+  "homepage": "https://github.com/holmatron/AW-Project1#readme",
+  "dependencies": {
+    "@aws-sdk/client-sns": "^3.121.0",
+    "aws-sdk": "^2.1168.0",
+    "dotenv": "^16.0.1",
+    "pg": "^8.7.3"
+  },
+  "type": "module"
+}
