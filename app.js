@@ -9,7 +9,7 @@ process.stdout.write(`Hello! Please add your working hours in this format:\n
 
 //CORRECT DATA
 // 2022-07-05,09:04,2022-07-05,17:19,Project Elmer,I coded and ate lunch
-// 2022-07-05,09:04,2022-07-05,12:19,Project Torstai,I coded and ate lunch
+// 2022-07-06,09:04,2022-07-06,12:19,Project Torstai,I coded and ate lunch
 // 2022-07-07,09:00,2022-07-07,17:50,Project Marsu,I coded and did some aws stuff
 //INVALID DATA
 // 2022-07-05, 09:04, 2022-07-04, 17:19, Project Elmer, I coded and ate lunch

@@ -8,12 +8,21 @@ const { Client } = pkg
 
 let allEntries = []
 let emailMessage = ""
+let yesterday = getYesterday()
 
+function getYesterday(date = new Date()) {
+  let previous = new Date(date.getTime())
+  previous.setDate(date.getDate() - 1)
+  previous = previous.toISOString().split('T')[0]
+  return previous
+}
+
+// get all entries from db added yesterday
 async function getDBdata() {
 
     const client = new Client({ connectionString: process.env.DB_CONNECTIONSTRING,})
         await client.connect()
-        const res = await client.query("SELECT * FROM timestamps")
+        const res = await client.query("SELECT * FROM timestamps WHERE start_date = $1", [yesterday])
         for (let i = 0; i < res.rows.length; i++) {
             allEntries.push(`\n NEW ENTRY:
             Start date and time: ${res.rows[i]["start_date"]} ${res.rows[i]["start_time"]}
