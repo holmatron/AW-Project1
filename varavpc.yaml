@@ -1,10 +1,5 @@
-AWSTemplateFormatVersion: 2010-09-09
-Description: Academy Demo CloudFormation
-
-Parameters:
-  LatestAmiId:
-    Type: "AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>"
-    Default: "/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2"
+# vpc and subnets template
+Description: Deploy a VPC with public/private subnets
 
 Resources:
   VPC:
@@ -12,12 +7,10 @@ Resources:
     Properties:
       CidrBlock: 10.1.0.0/16
       EnableDnsHostnames: true
-      Tags:
-        - Key: "Name"
-          Value: "projectone-koneet"
 
   InternetGateway:
     Type: AWS::EC2::InternetGateway
+    Properties:
 
   AttachGateway:
     Type: AWS::EC2::VPCGatewayAttachment
@@ -29,13 +22,22 @@ Resources:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
-      CidrBlock: 10.1.0.0/24
+      CidrBlock: 10.1.10.0/24
+      AvailabilityZone: !Select
+        - "0"
+        - !GetAZs ""
+      Tags:
+        - Key: Name
+          Value: Public Subnet 1
 
   PrivateSubnet1:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
-      CidrBlock: 10.1.1.0/24
+      CidrBlock: 10.2.20.0/24
+      AvailabilityZone: !Select
+        - "0"
+        - !GetAZs ""
 
   PublicRouteTable:
     Type: AWS::EC2::RouteTable
@@ -65,12 +67,3 @@ Resources:
     Properties:
       SubnetId: !Ref PrivateSubnet1
       RouteTableId: !Ref PrivateRouteTable
-Outputs:
-  VPC:
-    Description: VPC
-    Value: !Ref VPC
-  AZ1:
-    Description: Availability Zone 1
-    Value: !GetAtt
-      - PublicSubnet1
-      - AvailabilityZone
