@@ -17,7 +17,7 @@ Parameters:
   TopicName:
     Type: String
     Description: Topic Name
-    Default: ryhmayksi
+    Default: grpOne
 Resources:
   # a) Create a VPC
   myVPC:
@@ -131,7 +131,7 @@ Resources:
         BlockPublicPolicy: true
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
-      BucketName: ryhmaykshajoaaalisaa2
+      BucketName: grpone-bucketone
   MySNSTopic:
     Type: AWS::SNS::Topic
     Properties:

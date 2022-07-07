@@ -17,6 +17,8 @@ function getYesterday(date = new Date()) {
   return previous
 }
 
+console.log(yesterday)
+
 // get all entries from db added yesterday
 async function getDBdata() {
 
@@ -38,7 +40,7 @@ async function getDBdata() {
         await sendSNS()
 }
 
-getDBdata()
+//getDBdata()
 
 async function sendSNS() {
 

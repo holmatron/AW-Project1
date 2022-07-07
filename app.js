@@ -8,12 +8,12 @@ process.stdout.write(`Hello! Please add your working hours in this format:\n
 `)
 
 //CORRECT DATA
-// 2022-07-05,09:04,2022-07-05,17:19,Project Elmer,I coded and ate lunch
+// 2022-07-07,09:04,2022-07-07,17:19,Project MiauMiau,I coded and ate lunch
 // 2022-07-06,09:04,2022-07-06,12:19,Project Torstai,I coded and ate lunch
-// 2022-07-07,09:00,2022-07-07,17:50,Project Marsu,I coded and did some aws stuff
+// 2022-07-07,09:00,2022-07-07,17:50,Project Marsu,I coded and did some stuff
 //INVALID DATA
 // 2022-07-05, 09:04, 2022-07-04, 17:19, Project Elmer, I coded and ate lunch
-// 2022-07-05, 09:04, 2023-07-05, 17:19, Project Elmer, I coded and ate lunch
+// 2023-07-05, 09:04, 2022-07-05, 17:19, Project Elmer, I coded and ate lunch
 // 2022-07-05,09:04,2022-07-05,17:19,Project Elmer,I coded and ate lunch;--
 
 let allInput = ""
@@ -84,7 +84,7 @@ let validate = () => {
             process.exit()
         }
     }
-    if (yearOfStart < yearOfEnd) {
+    if (yearOfStart > yearOfEnd) {
         process.stdout.write(`Sorry there was a probelm with your input:\nEnd date can't be after start date.\nRestart to try again.`)
         process.exit()
     }
@@ -94,7 +94,6 @@ let validate = () => {
             process.exit()
         }
     }
-
     return
 }
 
