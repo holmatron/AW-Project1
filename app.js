@@ -113,4 +113,5 @@ async function toDB() {
     await client.end()
 }
 
+
 process.stdin.on('data', collectTimestamp)
