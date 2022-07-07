@@ -9,7 +9,8 @@ process.stdout.write(`Hello! Please add your working hours in this format:\n
 
 //CORRECT DATA
 // 2022-07-05,09:04,2022-07-05,17:19,Project Elmer,I coded and ate lunch
-// 2022-07-05,09:04,2022-07-05,12:19,Project Sun,I coded and ate lunch
+// 2022-07-05,09:04,2022-07-05,12:19,Project Torstai,I coded and ate lunch
+// 2022-07-07,09:00,2022-07-07,17:50,Project Marsu,I coded and did some aws stuff
 //INVALID DATA
 // 2022-07-05, 09:04, 2022-07-04, 17:19, Project Elmer, I coded and ate lunch
 // 2022-07-05, 09:04, 2023-07-05, 17:19, Project Elmer, I coded and ate lunch
@@ -107,7 +108,6 @@ async function toDB() {
     values.push(description)
     values.push(time_sum)
   
-    //postgres://YourUserName:YourPassword@YourEndpoint:5432/YourDatabaseName
     const client = new Client({ connectionString: process.env.DB_CONNECTIONSTRING,})
     await client.connect()
     const res = await client.query("INSERT INTO timestamps (start_date,start_time,end_date,end_time,project,description,time_sum) VALUES ($1,$2,$3,$4,$5,$6,$7)", values)
