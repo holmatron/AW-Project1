@@ -1,0 +1,178 @@
+Parameters:
+  paramVpcCIDR:
+    Description: Enter the IP range (CIDR notation) for VPC
+    Type: String
+    Default: 10.192.0.0/16
+  paramPublicSubnet1CIDR:
+    Description: Enter the IP range (CIDR notation)  for the public subnet in AZ A
+    Type: String
+    Default: 10.192.10.0/24
+  paramPrivateSubnet1CIDR:
+    Description: Enter the IP range (CIDR notation)  for the private subnet in AZ A
+    Type: String
+    Default: 10.192.20.0/24
+  LatestAmiId:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
+  TopicName:
+    Type: String
+    Description: Topic Name
+    Default: grpOne
+Resources:
+  # a) Create a VPC
+  myVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref paramVpcCIDR
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+  # b) Create a Internet Gateway
+  myInternetGateway:
+    Type: AWS::EC2::InternetGateway
+  # c) Attach the Internet Gateway to the VPC
+  myVPCGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref myVPC
+      InternetGatewayId: !Ref myInternetGateway
+  # a) Create a public route table for the VPC (will be public once it is associated with the Internet Gateway)
+  myPublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref myVPC
+  # b) Associate the public route table with the Internet Gateway
+  myPublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: myVPCGatewayAttachment
+    Properties:
+      RouteTableId: !Ref myPublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref myInternetGateway
+  # c) Create a public subnet in AZ 1 (will be public once it is associated with public route table)
+  myPublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref myVPC
+      AvailabilityZone: !Select [0, !GetAZs ""] # AZ 1
+      CidrBlock: !Ref paramPublicSubnet1CIDR
+      MapPublicIpOnLaunch: true
+  myPrivateSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref myVPC
+      AvailabilityZone: !Select [0, !GetAZs ""] # AZ 1
+      CidrBlock: !Ref paramPrivateSubnet1CIDR
+  # d) Associate the public route table with the public subnet in AZ 1
+  myPublicSubnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref myPublicRouteTable
+      SubnetId: !Ref myPublicSubnet1
+  myEIPforNatGateway1:
+    Type: AWS::EC2::EIP
+    DependsOn: myVPCGatewayAttachment
+    Properties:
+      Domain: vpc
+  myNatGateway1:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt myEIPforNatGateway1.AllocationId
+      SubnetId: !Ref myPublicSubnet1
+  myPrivateRouteTable1:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref myVPC
+  myPrivateRouteForAz1:
+    Type: AWS::EC2::Route
+    DependsOn: myVPCGatewayAttachment
+    Properties:
+      RouteTableId: !Ref myPrivateRouteTable1
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref myNatGateway1
+  # SG
+  PublicSubnetSecurityGroupG1:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow all HTTP
+      SecurityGroupIngress:
+        - CidrIp: 0.0.0.0/0
+          FromPort: 80
+          IpProtocol: tcp
+          ToPort: 80
+      VpcId: !Ref myVPC
+  PrivateSubnetSecurityGroupG1:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow public security group ingress
+      SecurityGroupIngress:
+        - SourceSecurityGroupId: !Ref PublicSubnetSecurityGroupG1
+          FromPort: 5432
+          IpProtocol: tcp
+          ToPort: 5432
+      VpcId: !Ref myVPC
+  # EC2
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      AvailabilityZone: us-east-1a
+      ImageId: !Ref LatestAmiId
+      InstanceType: t3.micro
+      SubnetId: !Ref myPublicSubnet1
+      SecurityGroupIds:
+        - !GetAtt PublicSubnetSecurityGroupG1.GroupId
+  # S3 Bucket
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    Properties:
+      AccessControl: Private
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      BucketName: grpone-bucketyksyks
+  MySNSTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      Subscription:
+        - Endpoint: "example@email.com"
+          Protocol: "email"
+      TopicName: !Ref TopicName
+
+  G1Secrets:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Description: "This is the secret for my RDS instance"
+      GenerateSecretString:
+        SecretStringTemplate: '{"username": "groupone"}'
+        GenerateStringKey: "password"
+        PasswordLength: 10
+        ExcludeCharacters: '"@/\'
+
+  G1RDS:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      AllocatedStorage: 20
+      DBInstanceClass: db.t3.micro
+      Engine: postgres
+      MasterUsername:
+        !Join [
+          "",
+          [
+            "{{resolve:secretsmanager:",
+            !Ref G1Secrets,
+            ":SecretString:username}}",
+          ],
+        ]
+      MasterUserPassword:
+        !Join [
+          "",
+          [
+            "{{resolve:secretsmanager:",
+            !Ref G1Secrets,
+            ":SecretString:password}}",
+          ],
+        ]
+      BackupRetentionPeriod: 0
+      DBInstanceIdentifier: "rds-instance"
